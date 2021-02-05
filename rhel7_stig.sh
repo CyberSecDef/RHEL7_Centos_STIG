@@ -182,7 +182,7 @@ EOF
 #-------------------------------------------------------------------------------
 # Requirement Functions
 #-------------------------------------------------------------------------------
-function _v204392 (){
+function __V204392 (){
     local title="The Red Hat Enterprise Linux operating system must be configured so that the file permissions,
 ownership, and group membership of system files and commands match the vendor values."
     local requirement="system files and commands must have default file permissions, ownership, and group membership"
@@ -2447,7 +2447,7 @@ Authority (CA) that is recognized and approved by the organization."
     local requirement="the value localpkg_gpgcheck=1 must be in  /etc/yum.conf"
 
     local vuln_id='V-204448'
-    local rule_id='SV-204448r505924_rule	'
+    local rule_id='SV-204448r505924_rule'
     local cci='CCI-001749'
     local severity='CAT I'
 
@@ -2827,8 +2827,6 @@ is configured to only use the SSHv2 protocol."
     local comments=""
     local ckl_verbiage=""
 
-
-
     if [[ `cat /etc/redhat-release | grep -oP "[0-9]\.[0-9]" | cut -d'.' -f2` -le 4 ]]; then
 
         check_results="$(grep -Ei "^Protocol[[:space:]]+2" /etc/ssh/sshd_config)"
@@ -2990,6 +2988,434 @@ $_template
 EOF
 "
 }
+
+function _V204620 (){
+    local title="The Red Hat Enterprise Linux operating system must not have a File Transfer Protocol 
+(FTP) server package installed unless needed."
+    local requirement="The vsftpd package must not be installed"
+    local vuln_id='V-204620'
+    local rule_id='SV-204620r505924_rule'
+    local cci='CCI-000366'
+    local severity='CAT I'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    check_results=`yum list installed vsftpd 2>&1 | grep -i "No matching Packages" | wc -l`
+    current_status=$( [[ $( echo -n "$check_results" ) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    #Fix requirement if needed
+    if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+        if [[ $( echo -n "$check_results" ) -eq 0 ]] || [[ $force_flag == 'true' ]]; then
+            yum remove vsftpd
+            
+            remediation="Removed vsftpd"
+        else
+            remediation="Not required"
+        fi
+    fi
+
+    #check settings again after fix
+    final_results=`yum list installed vsftpd 2>&1 | grep -i "No matching Packages" | wc -l`
+    final_status=$( [[ $( echo -n "$final_results" ) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function _V204621 (){
+    local title="The Red Hat Enterprise Linux operating system must not have the Trivial File Transfer 
+Protocol (TFTP) server package installed if not required for operational support."
+    local requirement="The  tftp-server package must not be installed"
+    local vuln_id='V-204621'
+    local rule_id='SV-204621r505924_rule'
+    local cci='CCI-000318'
+    local severity='CAT I'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    check_results=`yum list installed tftp-server 2>&1 | grep -i "No matching Packages" | wc -l`
+    current_status=$( [[ $( echo -n "$check_results" ) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    #Fix requirement if needed
+    if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+        if [[ $( echo -n "$check_results" ) -eq 0 ]] || [[ $force_flag == 'true' ]]; then
+            yum remove tftp-server
+            
+            remediation="Removed tftp-server"
+        else
+            remediation="Not required"
+        fi
+    fi
+
+    #check settings again after fix
+    final_results=`yum list installed tftp-server 2>&1 | grep -i "No matching Packages" | wc -l`
+    final_status=$( [[ $( echo -n "$final_results" ) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function _V204622 (){
+    local title="The Red Hat Enterprise Linux operating system must be configured so that remote X 
+connections for interactive users are encrypted."
+    local requirement="remote X connections for interactive users are encrypted."
+    local vuln_id='V-204622'
+    local rule_id='SV-204622r505924_rule'
+    local cci='CCI-000366'
+    local severity='CAT I'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    check_results="$(grep -Ei "^X11Forwarding[[:space:]]+yes" /etc/ssh/sshd_config)"
+    current_status=$( [[ $( echo -n "$check_results" | wc -c) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+        if
+            [[ $( echo -n "$check_results" | wc -c) -eq 0 ]] ||
+            [[ $force_flag == 'true' ]];
+        then
+
+            tmpfile=$(mktemp)
+            while read -r line
+            do
+                if [[ $line == *"X11Forwarding"* ]]; then
+                    echo "X11Forwarding yes" >> "$tmpfile"
+                else
+                    echo "$line" >> "$tmpfile"
+                fi
+            done < /etc/ssh/sshd_config
+
+            if [[ $(grep -Ei "^X11Forwarding[[:space:]]+yes" "$tmpfile" | wc -c)  -eq 0 ]]; then
+                echo "X11Forwarding yes" >> "$tmpfile"
+            fi
+
+            mv "$tmpfile" "/etc/ssh/sshd_config"
+            remediation="Updated settings in /etc/ssh/sshd_config"
+         else
+            remediation="Not required"
+        fi
+    fi
+
+    final_results="$(grep -Ei "^X11Forwarding[[:space:]]+yes" /etc/ssh/sshd_config)"
+    final_status=$( [[ $( echo -n "$final_results" | wc -c) -eq 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function _V204627 (){
+    local title="SNMP community strings on the Red Hat Enterprise Linux operating system must be changed 
+from the default."
+    local requirement="The system using SNMP is not using default community strings"
+    local vuln_id='V-204627'
+    local rule_id='SV-204627r505924_rule'
+    local cci='CCI-000366'
+    local severity='CAT I'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    if [[ -f "/etc/snmp/snmpd.conf" ]]; then
+
+        check_results="`grep -i 'public\|private' /etc/snmp/snmpd.conf 2>/dev/null`"
+        current_status=$( [[ $( echo -n "$check_results" | wc -c) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+        if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+            if
+                [[ $( echo -n "$check_results" | wc -c) -ne 0 ]] ||
+                [[ $force_flag == 'true' ]];
+            then
+
+                tmpfile=$(mktemp)
+                while read -r line
+                do
+                    if [[ $line == *"public"* ]]; then
+                        echo "" >> "$tmpfile"
+                    elif [[ $line == *"private"* ]]; then
+                        echo "" >> "$tmpfile"
+                    else
+                        echo "$line" >> "$tmpfile"
+                    fi
+                done < /etc/snmp/snmpd.conf
+
+                mv "$tmpfile" "/etc/snmp/snmpd.conf"
+                remediation="Updated settings in /etc/snmp/snmpd.conf"
+             else
+                remediation="Not required"
+            fi
+        fi
+
+        final_results="`grep -i 'public\|private' /etc/snmp/snmpd.conf 2>/dev/null`"
+        final_status=$( [[ $( echo -n "$final_results" | wc -c) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+    else
+        check_results="SNMP is not in use on asset"
+        current_status="Not_Applicable"
+        final_results="SNMP is not in use on asset"
+        final_status="Not_Applicable"
+        remediation="Not Needed"
+    fi
+
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function __V214799 (){
+    local title="The Red Hat Enterprise Linux operating system must be configured so that the cryptographic 
+hash of system files and commands matches vendor values."
+    local requirement="The cryptographic hash of system files and commands match the vendor values."
+    local vuln_id='V-214799'
+    local rule_id='SV-214799r505924_rule'
+    local cci='CCI-001749'
+    local severity='CAT I'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    check_results=`rpm -Va --noconfig | grep '^..5'`
+    current_status=$( [[ $( echo -n "$check_results" | wc -l ) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+    #Fix requirement if needed
+    if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+        
+        if [[ $( echo -n "$check_results" | wc -l ) -ne 0 ]] || [[ $force_flag == 'true' ]]; then
+            
+            remediation="No automation available"
+        fi
+    fi
+
+    #check settings again after fix
+    final_results=`rpm -Va --noconfig | grep '^..5'`
+    final_status=$( [[ $( echo -n "$final_results" | wc -l) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function _V214801 (){
+    local title="The Red Hat Enterprise Linux operating system must use a virus scan program."
+    local requirement="Verify an Anti-Virus program is installed"
+    local vuln_id='V-214801'
+    local rule_id='SV-214801r505924_rule'
+    local cci='CCI-001668'
+    local severity='CAT I'
+
+    local current_status="NotReviewed"
+    local remediation="No automation available"
+    local check_results="Unknown"
+    local final_results="NotReviewed"
+    local final_status="Unknown"
+    local comments="No automation available"
+    local ckl_verbiage=""
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+function _V204426 (){
+    local title="The Red Hat Enterprise Linux operating system must disable account identifiers 
+(individuals, groups, roles, and devices) if the password expires."
+    local requirement="the value INACTIVE=0 must be in  /etc/default/useradd"
+
+    local vuln_id='V-204426'
+    local rule_id='SV-204426r505924_rule'
+    local cci='CCI-000795'
+    local severity='CAT II'
+
+    local current_status=""
+    local remediation=""
+    local check_results=""
+    local final_results=""
+    local final_status=""
+    local comments=""
+    local ckl_verbiage=""
+
+    check_results=`grep -e "^INACTIVE=0" /etc/default/useradd`
+    current_status=$( [[ $( echo -n "$check_results" | wc -l) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $fix_flag ] && [ $fix_flag == "true" ]; then
+        if [[ $( echo -n "$check_results" | wc -l) -eq 0 ]] || [[ $force_flag == 'true' ]]; then
+            tmpfile=$(mktemp)
+            while read -r line
+            do
+                if [[ $line == *"INACTIVE"* ]]; then
+                    echo "INACTIVE=0" >> "$tmpfile"
+                else
+                    echo "$line" >> "$tmpfile"
+                fi
+            done < /etc/default/useradd
+
+            if [[ $( grep -i inactive "$tmpfile" | wc -c) -eq 0 ]]; then
+                echo "INACTIVE=0" >> "$tmpfile"
+            fi
+
+            mv "$tmpfile" "/etc/default/useradd"
+            remediation="Updated settings in /etc/default/useradd"
+        else
+            remediation="Not required"
+        fi
+    fi
+
+    final_results=`grep -e "^INACTIVE=0" /etc/default/useradd`
+    final_status=$( [[ $( echo -n "$final_results" | wc -l) -ne 0 ]] && echo "Open" || echo "NotAFinding")
+
+    if ! [ -z $ckl_file ]; then
+        comments="CKL updated via $(basename $0) by $( who am i | awk '{print $1}' ) - $( date )"
+        ckl_verbiage="Updating CKL File: $ckl_file
+    Status   - $final_status
+    Comments - $comments
+    Details  - $final_results
+"
+        python -c "$_update_ckl" --ckl "$ckl_file" --rule "$rule_id" --status "$final_status" --comments "$comments" --details "$final_results"
+    fi
+
+    eval "cat <<EOF
+$_template
+EOF
+"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
